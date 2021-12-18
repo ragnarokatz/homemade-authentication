@@ -15,7 +15,7 @@ module.exports.generateSalt = function () {
   });
 };
 
-module.exports.hash = function (password, salt, pepper) {
+module.exports.hash = function (password, salt) {
   return new Promise((resolve, reject) => {
     bcrypt.hash(password, salt, function (err, hash) {
       if (err) {
@@ -26,5 +26,20 @@ module.exports.hash = function (password, salt, pepper) {
         resolve(hash);
       }
     });
+  });
+};
+
+module.exports.compareHash = function (password, salt, passhash) {
+  return new Promise(async (resolve, reject) => {
+    let hash = await this.hash(password, salt);
+    if (hash === passhash) {
+      var message = 'the password hashes match';
+      debug(message);
+      resolve(message);
+    } else {
+      var message = 'the password hashes do not match';
+      debug(message);
+      reject(message);
+    }
   });
 };

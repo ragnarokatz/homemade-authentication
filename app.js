@@ -25,7 +25,7 @@ app.get('/protected', (req, res) => {
 app.post('/account/register', async (req, res) => {
   debug('adding account');
   accounts
-    .validateAccount(req.body)
+    .validateRegister(req.body)
     .then((data) => {
       accounts
         .addAccount(data)
@@ -48,10 +48,10 @@ app.post('/account/register', async (req, res) => {
 app.post('/account/login', async (req, res) => {
   debug('adding account');
   accounts
-    .validateAccount(req.body)
+    .validateLogin(req.body)
     .then((data) => {
       accounts
-        .addAccount(data)
+        .verifyAccount(data)
         .then((result) => {
           res.json(result);
         })
