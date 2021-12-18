@@ -1,7 +1,7 @@
 {
-  "name": "postgres-api-template",
+  "name": "homemade-authentication",
   "version": "1.0.0",
-  "description": "a template web api service with postgres SQL as database",
+  "description": "homemade authentication system",
   "main": "server.js",
   "scripts": {
     "test": "npm run jest",
