@@ -23,7 +23,7 @@ app.get('/protected', (req, res) => {
 });
 
 app.post('/account/register', async (req, res) => {
-  debug('adding account');
+  debug('registering an account');
   accounts
     .validateRegister(req.body)
     .then((data) => {
@@ -46,7 +46,7 @@ app.post('/account/register', async (req, res) => {
 });
 
 app.post('/account/login', async (req, res) => {
-  debug('adding account');
+  debug('login with an account');
   accounts
     .validateLogin(req.body)
     .then((data) => {

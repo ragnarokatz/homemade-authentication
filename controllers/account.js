@@ -1,7 +1,7 @@
 const debug = require('debug')('api:controllers:account');
 const Joi = require('joi');
 const pool = require('../database/pool');
-const utils = require('../utils');
+const utils = require('../utils/crypto');
 
 const registerSchema = Joi.object({
   email: Joi.string()

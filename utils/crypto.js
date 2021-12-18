@@ -1,4 +1,4 @@
-const debug = require('debug')('api:utils');
+const debug = require('debug')('api:utils:crypto');
 const bcrypt = require('bcryptjs');
 
 module.exports.generateSalt = function () {
