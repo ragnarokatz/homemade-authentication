@@ -2,14 +2,35 @@ const debug = require('debug')('api:controllers:account');
 const Joi = require('joi');
 const pool = require('../database/pool');
 
-const accountSchema = Joi.object({
-  username: Joi.string().alphanum().min(8).max(12).required(),
-  description: Joi.string()
-    .regex(/^[a-zA-Z0-9,. ]*$/)
-    .min(2)
+const accountRegisterSchema = Joi.object({
+  email: Joi.string()
+    .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+    .min(10)
     .max(30)
     .required(),
-  age: Joi.number().integer().min(1).max(120).required(),
+  password: Joi.string()
+    .regex(/^[a-zA-Z0-9]*$/)
+    .min(8)
+    .max(20)
+    .required(),
+  confirmPassword: Joi.string()
+    .regex(/^[a-zA-Z0-9]*$/)
+    .min(8)
+    .max(20)
+    .required(),
+});
+
+const accountLoginSchema = Joi.object({
+  email: Joi.string()
+    .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+    .min(10)
+    .max(30)
+    .required(),
+  password: Joi.string()
+    .regex(/^[a-zA-Z0-9]*$/)
+    .min(8)
+    .max(20)
+    .required(),
 });
 
 module.exports.getAllAccounts = function () {

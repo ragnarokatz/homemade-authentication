@@ -17,21 +17,12 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '/index.html'));
 });
 
-app.get('/accounts', (req, res) => {
-  debug('retrieving all accounts');
-  accounts
-    .getAllAccounts()
-    .then((data) => {
-      res.json(data);
-    })
-    .catch((error) =>
-      res.status(404).json({
-        message: error,
-      })
-    );
+app.get('/protected', (req, res) => {
+  debug('visiting protected route');
+  res.sendFile(path.join(__dirname, '/protected.html'));
 });
 
-app.post('/accounts/add', async (req, res) => {
+app.post('/account/register', async (req, res) => {
   debug('adding account');
   accounts
     .validateAccount(req.body)
@@ -54,27 +45,13 @@ app.post('/accounts/add', async (req, res) => {
     );
 });
 
-app.get('/accounts/:account_id', async (req, res) => {
-  debug('getting account with id ' + req.params.account_id);
-  accounts
-    .getAccount(req.params.account_id)
-    .then((result) => {
-      res.json(result);
-    })
-    .catch((error) =>
-      res.status(404).json({
-        message: error,
-      })
-    );
-});
-
-app.put('/accounts/:account_id', async (req, res) => {
-  debug('updating account with id ' + req.params.account_id);
+app.post('/account/login', async (req, res) => {
+  debug('adding account');
   accounts
     .validateAccount(req.body)
     .then((data) => {
       accounts
-        .updateAccount(req.params.account_id, data)
+        .addAccount(data)
         .then((result) => {
           res.json(result);
         })
@@ -91,12 +68,44 @@ app.put('/accounts/:account_id', async (req, res) => {
     );
 });
 
-app.delete('/accounts/:account_id', async (req, res) => {
-  debug('deleting account with id ' + req.params.account_id);
+app.post('/account/authenticate', async (req, res) => {
+  debug('adding account');
   accounts
-    .deleteAccount(req.params.account_id)
-    .then((result) => {
-      res.json(result);
+    .validateAccount(req.body)
+    .then((data) => {
+      accounts
+        .addAccount(data)
+        .then((result) => {
+          res.json(result);
+        })
+        .catch((error) =>
+          res.status(404).json({
+            message: error,
+          })
+        );
+    })
+    .catch((error) =>
+      res.status(404).json({
+        message: error,
+      })
+    );
+});
+
+app.get('/account/logout', async (req, res) => {
+  debug('adding account');
+  accounts
+    .validateAccount(req.body)
+    .then((data) => {
+      accounts
+        .addAccount(data)
+        .then((result) => {
+          res.json(result);
+        })
+        .catch((error) =>
+          res.status(404).json({
+            message: error,
+          })
+        );
     })
     .catch((error) =>
       res.status(404).json({
