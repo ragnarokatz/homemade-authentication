@@ -1,6 +1,7 @@
 const debug = require('debug')('api:controllers:account');
 const Joi = require('joi');
 const pool = require('../database/pool');
+const utils = require('../utils');
 
 const registerSchema = Joi.object({
   email: Joi.string()
@@ -33,10 +34,29 @@ const loginSchema = Joi.object({
     .required(),
 });
 
-module.exports.validateRegister = function (account) {
+module.exports.validateRegister = function (item) {
   return new Promise((resolve, reject) => {
     try {
-      result = Joi.attempt(account, registerSchema);
+      result = Joi.attempt(item, registerSchema);
+
+      if (item.password === item.confirmPassword) {
+        resolve(result);
+      } else {
+        let message = 'password does not match confirm password';
+        debug(message);
+        reject(message);
+      }
+    } catch (err) {
+      debug(err);
+      reject(err);
+    }
+  });
+};
+
+module.exports.validateLogin = function (item) {
+  return new Promise((resolve, reject) => {
+    try {
+      result = Joi.attempt(item, loginSchema);
       resolve(result);
     } catch (err) {
       debug(err);
@@ -45,23 +65,13 @@ module.exports.validateRegister = function (account) {
   });
 };
 
-module.exports.validateLogin = function (account) {
-  return new Promise((resolve, reject) => {
-    try {
-      result = Joi.attempt(account, loginSchema);
-      resolve(result);
-    } catch (err) {
-      debug(err);
-      reject(err);
-    }
-  });
-};
-
-module.exports.addAccount = function (item) {
+module.exports.registerAccount = function (item) {
   return new Promise(async (resolve, reject) => {
     try {
       const db = await pool.connect();
-      var sql = `INSERT INTO accounts (username, description, age) VALUES ('${item.username}', '${item.description}', ${item.age}) RETURNING id;`;
+      let salt = await utils.generateSalt();
+      let passhash = await utils.hash(item.password, salt);
+      var sql = `INSERT INTO accounts (email, passhash, salt) VALUES ('${item.email}', '${passhash}', '${salt}') RETURNING id;`;
       let result = await db.query(sql);
       resolve(result.rows[0]);
     } catch (err) {
@@ -71,22 +81,22 @@ module.exports.addAccount = function (item) {
   });
 };
 
-module.exports.verifyAccount = function (email) {
+module.exports.verifyAccount = function (item) {
   return new Promise(async (resolve, reject) => {
     try {
       const db = await pool.connect();
-      let accounts = await db.query(`SELECT * FROM accounts WHERE email = '${email}';`);
+      let accounts = await db.query(`SELECT * FROM accounts WHERE email = '${item.email}';`);
       if (accounts.rowCount == 0) {
-        let err = 'account not found for email ' + email;
+        let err = 'account not found for email ' + item.email;
         reject(err);
       }
       if (accounts.rowCount > 1) {
-        let err = 'multiple accounts found for email ' + email;
+        let err = 'multiple accounts found for email ' + item.email;
         reject(err);
       }
       let account = accounts.rows[0];
-
-      resolve();
+      let result = await utils.compareHash(item.password, account.salt, account.passhash);
+      resolve(result);
     } catch (err) {
       debug(err);
       reject(err);

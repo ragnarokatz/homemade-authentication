@@ -28,7 +28,7 @@ app.post('/account/register', async (req, res) => {
     .validateRegister(req.body)
     .then((data) => {
       accounts
-        .addAccount(data)
+        .registerAccount(data)
         .then((result) => {
           res.json(result);
         })

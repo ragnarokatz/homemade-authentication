@@ -6,5 +6,5 @@ CREATE TABLE accounts (
     email varchar(30) NOT NULL UNIQUE,
     passhash varchar(30) NOT NULL,
     salt varchar(20) NOT NULL,
-    verified BOOLEAN NOT NULL,
+    verified BOOLEAN NOT NULL DEFAULT FALSE,
 );
