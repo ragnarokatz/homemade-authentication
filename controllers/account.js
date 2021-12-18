@@ -71,7 +71,7 @@ module.exports.registerAccount = function (item) {
       const db = await pool.connect();
       let salt = await utils.generateSalt();
       let passhash = await utils.hash(item.password, salt);
-      var sql = `INSERT INTO accounts (email, passhash, salt) VALUES ('${item.email}', '${passhash}', '${salt}') RETURNING id;`;
+      var sql = `INSERT INTO accounts (email, passhash) VALUES ('${item.email}', '${passhash}') RETURNING id;`;
       let result = await db.query(sql);
       resolve(result.rows[0]);
     } catch (err) {

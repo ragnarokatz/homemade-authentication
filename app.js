@@ -53,11 +53,11 @@ app.post('/account/login', async (req, res) => {
     .then((data) => {
       accounts
         .verifyAccount(data)
-        .then((result) => {
+        .then(() => {
           jwt
             .sign(req.body)
-            .then((result) => {
-              res.json(result);
+            .then((token) => {
+              res.send(token);
             })
             .catch((error) => {
               res.status(404).json({

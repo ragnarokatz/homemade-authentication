@@ -1,9 +1,9 @@
 const debug = require('debug')('api:utils:crypto');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('becrypt');
 
 module.exports.generateSalt = function () {
   return new Promise((resolve, reject) => {
-    bcrypt.genSalt(10, function (err, salt) {
+    bcrypt.genSalt(8, function (err, salt) {
       if (err) {
         var message = 'There was an error generating salt';
         debug(message);
@@ -29,17 +29,15 @@ module.exports.hash = function (password, salt) {
   });
 };
 
-module.exports.compareHash = function (password, salt, passhash) {
+module.exports.compareHash = function (password, passhash) {
   return new Promise(async (resolve, reject) => {
-    let hash = await this.hash(password, salt);
-    if (hash === passhash) {
-      var message = 'the password hashes match';
-      debug(message);
-      resolve(message);
-    } else {
-      var message = 'the password hashes do not match';
-      debug(message);
-      reject(message);
-    }
+    bcrypt.compare(password, passhash, function (err, same) {
+      if (err) {
+        debug(message);
+        reject(message);
+      } else {
+        resolve(same);
+      }
+    });
   });
 };
