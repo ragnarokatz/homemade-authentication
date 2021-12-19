@@ -13,6 +13,28 @@ app.use(cors());
 const accounts = require('./controllers/account');
 const jwt = require('./utils/jwt');
 
+const checkToken = (req, res, next) => {
+  const header = req.headers['authorization'];
+  if (typeof header == 'undefined' || header == null) {
+    res.status(403).json({
+      message: 'invalid header',
+    });
+  } else {
+    const bearer = header.split(' ');
+    const token = bearer[1];
+    jwt
+      .verify(token)
+      .then(() => {
+        next();
+      })
+      .catch((error) => {
+        res.status(403).json({
+          message: error,
+        });
+      });
+  }
+};
+
 app.get('/', (req, res) => {
   debug('visiting root');
   res.sendFile(path.join(__dirname, '/index.html'));
@@ -53,7 +75,8 @@ app.post('/account/login', async (req, res) => {
     .then((data) => {
       accounts
         .verifyAccount(data)
-        .then(() => {
+        .then((result) => {
+          debug(result);
           jwt
             .sign(req.body)
             .then((token) => {
@@ -77,29 +100,6 @@ app.post('/account/login', async (req, res) => {
       })
     );
 });
-
-const checkToken = (req, res, next) => {
-  const header = req.headers['authorization'];
-
-  if (typeof header === 'undefined' || header == null) {
-    res.status(403).json({
-      message: 'invalid header',
-    });
-  }
-
-  const bearer = header.split(' ');
-  const token = bearer[1];
-  jwt
-    .verify(token)
-    .then(() => {
-      next();
-    })
-    .catch((error) => {
-      res.status(403).json({
-        message: error,
-      });
-    });
-};
 
 app.use((req, res) => {
   debug('visiting non existing resource');

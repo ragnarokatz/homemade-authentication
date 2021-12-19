@@ -1,7 +1,7 @@
 const debug = require('debug')('api:utils:jwt');
 const jwt = require('jsonwebtoken');
 
-let secret = 'privatekey';
+let secret = process.env.SECRET || 'secret';
 
 module.exports.sign = function (payload) {
   return new Promise((resolve, reject) => {

@@ -95,7 +95,7 @@ module.exports.verifyAccount = function (item) {
         reject(err);
       }
       let account = accounts.rows[0];
-      let result = await utils.compareHash(item.password, account.salt, account.passhash);
+      let result = await utils.compareHash(item.password, account.passhash);
       resolve(result);
     } catch (err) {
       debug(err);
