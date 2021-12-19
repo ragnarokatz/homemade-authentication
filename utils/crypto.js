@@ -1,5 +1,5 @@
 const debug = require('debug')('api:utils:crypto');
-const bcrypt = require('becrypt');
+const bcrypt = require('bcrypt');
 
 module.exports.generateSalt = function () {
   return new Promise((resolve, reject) => {
