@@ -1,7 +1,9 @@
 const debug = require('debug')('api:controllers:account');
 const Joi = require('joi');
+const bcrypt = require('bcrypt');
 const pool = require('../database/pool');
-const utils = require('../utils/crypto');
+
+const ROUNDS = 10;
 
 const registerSchema = Joi.object({
   email: Joi.string()
@@ -69,8 +71,8 @@ module.exports.registerAccount = function (item) {
   return new Promise(async (resolve, reject) => {
     try {
       const db = await pool.connect();
-      let salt = await utils.generateSalt();
-      let passhash = await utils.hash(item.password, salt);
+      let salt = await bcrypt.genSalt(ROUNDS);
+      let passhash = await bcrypt.hash(item.password, salt);
       var sql = `INSERT INTO accounts (email, passhash) VALUES ('${item.email}', '${passhash}') RETURNING id;`;
       let result = await db.query(sql);
       resolve(result.rows[0]);
@@ -90,13 +92,28 @@ module.exports.verifyAccount = function (item) {
         let err = 'account not found for email ' + item.email;
         reject(err);
       }
+
       if (accounts.rowCount > 1) {
         let err = 'multiple accounts found for email ' + item.email;
         reject(err);
       }
+
       let account = accounts.rows[0];
-      let result = await utils.compareHash(item.password, account.passhash);
-      resolve(result);
+      bcrypt
+        .compare(item.password, account.passhash)
+        .then((result) => {
+          if (result == true) {
+            resolve(result);
+          } else {
+            let message = 'incorrect password';
+            debug(message);
+            reject({ message: message });
+          }
+        })
+        .catch((err) => {
+          debug(err);
+          reject(err);
+        });
     } catch (err) {
       debug(err);
       reject(err);

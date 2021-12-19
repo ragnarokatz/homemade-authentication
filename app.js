@@ -5,13 +5,14 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 const app = express();
 
 app.use(bodyParser.json());
 app.use(cors());
 
+const SECRET = process.env.SECRET || 'secret';
 const accounts = require('./controllers/account');
-const jwt = require('./utils/jwt');
 
 const checkToken = (req, res, next) => {
   const header = req.headers['authorization'];
@@ -22,16 +23,16 @@ const checkToken = (req, res, next) => {
   } else {
     const bearer = header.split(' ');
     const token = bearer[1];
-    jwt
-      .verify(token)
-      .then(() => {
-        next();
-      })
-      .catch((error) => {
+
+    jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
         res.status(403).json({
-          message: error,
+          message: err,
         });
-      });
+      } else {
+        next();
+      }
+    });
   }
 };
 
@@ -77,16 +78,15 @@ app.post('/account/login', async (req, res) => {
         .verifyAccount(data)
         .then((result) => {
           debug(result);
-          jwt
-            .sign(req.body)
-            .then((token) => {
-              res.send(token);
-            })
-            .catch((error) => {
+          jwt.sign(req.body, SECRET, { expiresIn: '1h', algorithm: 'HS256' }, (err, token) => {
+            if (err) {
               res.status(404).json({
-                message: error,
+                message: err,
               });
-            });
+            } else {
+              res.send(token);
+            }
+          });
         })
         .catch((error) =>
           res.status(404).json({
