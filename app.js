@@ -14,36 +14,9 @@ app.use(cors());
 const SECRET = process.env.SECRET || 'secret';
 const accounts = require('./controllers/account');
 
-const checkToken = (req, res, next) => {
-  const header = req.headers['authorization'];
-  if (typeof header == 'undefined' || header == null) {
-    res.status(403).json({
-      message: 'invalid header',
-    });
-  } else {
-    const bearer = header.split(' ');
-    const token = bearer[1];
-
-    jwt.verify(token, SECRET, (err, decoded) => {
-      if (err) {
-        res.status(403).json({
-          message: err,
-        });
-      } else {
-        next();
-      }
-    });
-  }
-};
-
 app.get('/', (req, res) => {
   debug('visiting root');
   res.sendFile(path.join(__dirname, '/index.html'));
-});
-
-app.get('/protected', checkToken, (req, res) => {
-  debug('visiting protected route');
-  res.sendFile(path.join(__dirname, '/protected.html'));
 });
 
 app.post('/account/register', async (req, res) => {
@@ -84,7 +57,9 @@ app.post('/account/login', async (req, res) => {
                 message: err,
               });
             } else {
-              res.send(token);
+              res.json({
+                token: token,
+              });
             }
           });
         })
@@ -93,6 +68,28 @@ app.post('/account/login', async (req, res) => {
             message: error,
           })
         );
+    })
+    .catch((error) =>
+      res.status(404).json({
+        message: error,
+      })
+    );
+});
+
+app.post('/account/validate', async (req, res) => {
+  debug('validate a token');
+  accounts
+    .validateToken(req.body)
+    .then((token) => {
+      jwt.verify(token, SECRET, (err, decoded) => {
+        if (err) {
+          res.status(404).json({
+            message: err,
+          });
+        } else {
+          res.json({ token: token });
+        }
+      });
     })
     .catch((error) =>
       res.status(404).json({
