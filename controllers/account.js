@@ -38,7 +38,7 @@ const loginSchema = Joi.object({
 
 const tokenSchema = Joi.object({
   token: Joi.string()
-    .regex(/^[a-zA-Z0-9.-]*$/)
+    .regex(/^[a-zA-Z0-9.-_]*$/)
     .min(50)
     .max(225)
     .required(),

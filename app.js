@@ -17,7 +17,7 @@ const checkToken = (req, res, next) => {
   const header = req.headers['authorization'];
   if (typeof header == 'undefined' || header == null) {
     res.status(403).json({
-      message: 'invalid header',
+      message: `invalid header`,
     });
   } else {
     const bearer = header.split(' ');
@@ -56,17 +56,17 @@ app.post('/account/register', async (req, res) => {
         .then((result) => {
           res.json(result);
         })
-        .catch((error) =>
+        .catch((err) => {
           res.status(404).json({
-            message: error,
-          })
-        );
+            message: err,
+          });
+        });
     })
-    .catch((error) =>
+    .catch((err) => {
       res.status(404).json({
-        message: error,
-      })
-    );
+        message: err,
+      });
+    });
 });
 
 app.post('/account/login', async (req, res) => {
@@ -90,15 +90,15 @@ app.post('/account/login', async (req, res) => {
               });
             });
         })
-        .catch((error) =>
+        .catch((err) =>
           res.status(404).json({
-            message: error,
+            message: err,
           })
         );
     })
-    .catch((error) =>
+    .catch((err) =>
       res.status(404).json({
-        message: error,
+        message: err,
       })
     );
 });
@@ -124,13 +124,13 @@ app.post('/account/validate', async (req, res) => {
         })
         .catch((err) => {
           res.status(404).json({
-            message: error,
+            message: err,
           });
         });
     })
-    .catch((error) =>
+    .catch((err) =>
       res.status(404).json({
-        message: error,
+        message: err,
       })
     );
 });
