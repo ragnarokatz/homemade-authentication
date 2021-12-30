@@ -67,6 +67,18 @@ module.exports.validateLogin = function (item) {
   });
 };
 
+module.exports.validateToken = function (item) {
+  return new Promise((resolve, reject) => {
+    try {
+      result = Joi.attempt(item, loginSchema);
+      resolve(result);
+    } catch (err) {
+      debug(err);
+      reject(err);
+    }
+  });
+};
+
 module.exports.registerAccount = function (item) {
   return new Promise(async (resolve, reject) => {
     try {
