@@ -4,7 +4,7 @@ A homemade authentication system using bcrypt.
 
 ### Application links
 
-- web-api: https://pg-api-template.herokuapp.com/
+- web-api: https://homemade-authentication.herokuapp.com/
 
 ### Database
 
