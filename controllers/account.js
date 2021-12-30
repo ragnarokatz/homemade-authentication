@@ -39,7 +39,7 @@ const loginSchema = Joi.object({
 const tokenSchema = Joi.object({
   token: Joi.string()
     .regex(/^[a-zA-Z0-9.-]*$/)
-    .min(64)
+    .min(50)
     .max(225)
     .required(),
 });
@@ -54,7 +54,7 @@ module.exports.validateRegister = function (item) {
       } else {
         let message = 'password does not match confirm password';
         debug(message);
-        reject(message);
+        throw new Error(message);
       }
     } catch (err) {
       debug(err);
