@@ -36,6 +36,14 @@ const loginSchema = Joi.object({
     .required(),
 });
 
+const tokenSchema = Joi.object({
+  token: Joi.string()
+    .regex(/^[a-zA-Z0-9.-]*$/)
+    .min(64)
+    .max(225)
+    .required(),
+});
+
 module.exports.validateRegister = function (item) {
   return new Promise((resolve, reject) => {
     try {
@@ -70,7 +78,7 @@ module.exports.validateLogin = function (item) {
 module.exports.validateToken = function (item) {
   return new Promise((resolve, reject) => {
     try {
-      result = Joi.attempt(item, loginSchema);
+      result = Joi.attempt(item, tokenSchema);
       resolve(result);
     } catch (err) {
       debug(err);

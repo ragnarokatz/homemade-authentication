@@ -40,6 +40,7 @@ A homemade authentication system using bcrypt.
 - `/protected` GET - protected page
 - `/account/register` POST - register an account
 - `/accounts/login` POST - authenticate an account
+- `/accounts/validate` POST - validate a token
 
 ### Dev environment setup
 
